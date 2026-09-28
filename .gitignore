@@ -1,0 +1,13 @@
+# Compiled artifacts
+*.o
+*.a
+*.so
+*.exe
+
+# Build directory
+build/
+
+# Executables — adjust to your actual output names
+assembler
+disassembler
+hexview
