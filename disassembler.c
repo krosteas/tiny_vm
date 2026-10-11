@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include "isa.h"
 
-int disass(FILE* fptr,unsigned char byte, unsigned int *offset);
+int disass(FILE* fptr,unsigned char byte, unsigned int *offset,InstructionDef *currentInstruction);
 
 int main(int argc, char* argv[]){
 
@@ -14,6 +15,7 @@ int main(int argc, char* argv[]){
     unsigned int offset = 0;
     size_t ret;
     int result = 0;
+    InstructionDef currentinstruction;
 
     fptr = fopen(argv[1],"rb");
 
@@ -31,7 +33,7 @@ int main(int argc, char* argv[]){
         if(ret == 0){
             break;
         }
-        result = disass(fptr,byte,&offset);
+        result = disass(fptr,byte,&offset,&currentinstruction);
         if(result == 0){
                 if (fclose(fptr) != 0)
                     {
@@ -66,9 +68,46 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
-int disass(FILE* fptr,unsigned char byte, unsigned int* offset){
+int disass(FILE* fptr,unsigned char byte, unsigned int* offset,InstructionDef *currentInstruction){
     unsigned char operand;
+    int ret;
 
+    ret = OpcodeLookup(byte,currentInstruction);
+    if (ret == 0)
+    {
+        printf("Invalid Opcode\n");
+        return 0;
+    }
+    
+    if (currentInstruction->operand_count == 0)
+    {
+        if (currentInstruction->opcode == 0xFF)
+        {
+            printf("%08X %02X   \tHALT\n",*offset,(unsigned int)byte);
+            if(fread(&operand,1,1,fptr) == 1){
+                    printf("Trailing Data Found After HALT!\n");
+                    return 0;
+            }
+            return 2;
+        }
+        printf("%08X %02X   \t%s\n",*offset,(unsigned int)currentInstruction->opcode,currentInstruction->mnemonic);
+        return 1;
+    }else if (currentInstruction->operand_count == 1)
+    {
+        if(fread(&operand,1,1,fptr) != 1){
+            printf("%08X %02X   \t%s MISSING OPERAND\n",*offset,(unsigned int)currentInstruction->opcode,currentInstruction->mnemonic);
+            return 0;
+        }
+        printf("%08X %02X %02X\t%s %d\n",*offset,(unsigned int)currentInstruction->opcode,(unsigned int)operand,currentInstruction->mnemonic,(unsigned int)operand);
+        (*offset)++;
+        return 1;
+    }else
+    {
+        printf("Invalid amount of operands!\n");
+        return 0;
+    }
+    
+    /*
     switch (byte)
     {
     case 0x01:
@@ -104,5 +143,5 @@ int disass(FILE* fptr,unsigned char byte, unsigned int* offset){
         printf("%08X %02X   \tUnknown Opcode\n",*offset,(unsigned int)byte);
         return 0;
     }
-
+    */
 }

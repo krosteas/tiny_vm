@@ -64,15 +64,15 @@ void printline(unsigned long int offset, unsigned char *readbytes, size_t len){
 
 	if (len < 16)
 	{
-		for(int i = 0; i < len; i++){
+		for(size_t i = 0; i < len; i++){
 			printf("%02X ",(unsigned int)readbytes[i]);	
 		}
-		for (int i = len; i < 16; i++)
+		for (size_t i = len; i < 16; i++)
 		{
 			printf("   ");
 		}
 		printf("\t");
-		for (int i = 0; i < len; i++)
+		for (size_t i = 0; i < len; i++)
 		{
 			if (isprint(readbytes[i]))
 			{
@@ -87,11 +87,11 @@ void printline(unsigned long int offset, unsigned char *readbytes, size_t len){
 	}
 	else
 	{
-		for(int i = 0; i < len; i++){
+		for(size_t i = 0; i < len; i++){
 			printf("%02X ",(unsigned int)readbytes[i]);	
 		}
 		printf("\t");
-		for (int i = 0; i < len; i++)
+		for (size_t i = 0; i < len; i++)
 		{
 			if (isprint(readbytes[i]))
 			{

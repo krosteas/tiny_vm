@@ -13,20 +13,14 @@ static const InstructionDef instruction_set[] = {
 
 int OpcodeLookup(unsigned char byte, InstructionDef* iptr){
 
-    if (((size_t)byte) < sizeof(instruction_set) && ((unsigned int)byte) > 0)
+    for (size_t i = 0; i < sizeof(instruction_set) / sizeof(instruction_set[0]); i++)
     {
-        for (size_t i = 0; i < sizeof(instruction_set); i++)
+        if (byte == instruction_set[i].opcode)
         {
-            if (byte == instruction_set[i].opcode)
-            {
-                iptr = &instruction_set[i];
-                return 1;
-            }
+            *iptr = instruction_set[i];
+            return 1;
         }
-    }else
-    {
-        return 0;
     }
-    return 2;
+    return 0;
 }
 InstructionDef MnemonicLookup(char *instruction);
